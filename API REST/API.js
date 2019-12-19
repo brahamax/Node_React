@@ -1,12 +1,13 @@
 //L'application requiert l'utilisation du module Express.
-//La variable express nous permettra d'utiliser les fonctionnalités du module Express.
+//La variable me permettra d'utiliser les fonctionnalités du module Express.
 var express = require('express'); 
-
+//La variable me permettra d'utiliser les fonctionnalités du module Body-Parser.
 var bodyParser = require("body-parser"); 
-
+//La variable me permettra d'utiliser les fonctionnalités du module FS.
 var fs = require('fs');
 
-var listep=[]; //liste des objets produits remplace provisoirement la BDD
+//liste des objets produits qui remplace provisoirement la BDD
+static var listep=[]; 
 
 //La Classe Produit
 var Produit = function (id,nom,type,price,raiting,warranty_years,available) {
@@ -84,8 +85,6 @@ var Produit = function (id,nom,type,price,raiting,warranty_years,available) {
 };
 
 
-
-
 //Lecture du fichier JSON et création des Objet JSON 
 var obj = JSON.parse(fs.readFileSync('Products.json', 'utf8'));
 //Parcours des objets JSON et création d'objets Produits que je stock par la suite dans l'arraylist dédié à ces derniers 
@@ -94,8 +93,6 @@ for(var i= 0; i < obj.length; i++)
     listep.push(new Produit(obj[i]._id,obj[i].name,obj[i].type,obj[i].price,obj[i].rating,obj[i].warranty_years,obj[i].available));
 }
 
-    
-
 
 // Je défini ici les paramètres du serveur.
 var hostname = 'localhost'; 
@@ -103,39 +100,35 @@ var port = 3000;
  
 // Je crée un objet de type Express. 
 var app = express(); 
-
-
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-//Afin de faciliter le routage (les URL que nous souhaitons prendre en charge dans notre API), nous créons un objet Router.
-//C'est à partir de cet objet myRouter, que nous allons implémenter les méthodes. 
+//Afin de faciliter le routage je crée un objet Router.
+//C'est à partir de cet objet myRouter, que je vais implémenter les méthodes. 
 var myRouter = express.Router(); 
  
-// Je rappel la route (/produits).  
+// Je rappelle la route (/produits).  
 myRouter.route('/produits')
-// J'implémente les méthodes GET & POST
-// GET affichage de tous les produits
-.get(function(req,res){      
+//affichage de tous les produits
+.all(function(req,res){      
  res.json({message : "Liste de tous les produits:" + '\n' +listep.toString()});});
 
-
-// Je rappel la route (/). 
+// Je rappelle la route (/). 
 myRouter.route('/')
-// all permet de prendre en charge toutes les méthodes.
+// All permet de prendre en charge toutes les méthodes.
 // Acceuil
 .all(function(req,res){ 
       res.json({message : "Bienvenue sur l'API_REST pour voir la liste des produits utilisez la route /produits, pour intéragir sur les objets utilisez la route /produits/action", methode : req.method});
 });
 
-// Je rappel la route (/produits/action'). 
+// Je rappelle la route (/produits/action'). 
 myRouter.route('/produits/action')
 .all(function(req,res){ 
       res.json({message : "Liste des actions /add, /recherche?id=, /update, /delete ", methode : req.method});
 });
 
-
+// La route pour la méthode de recherche
 myRouter.route('/produits/action/recherche')
-// J'implémente les méthodes GET, PUT, DELETE.
+// J'implémente les méthodes GET.
 // Get pour afficher un produit avec un id précis
 .get(function(req,res){ 
     for(var i= 0; i < listep.length; i++)
@@ -151,6 +144,7 @@ myRouter.route('/produits/action/recherche')
     
 });
 
+// La route pour la méthode d'ajout de produits
 myRouter.route('/produits/action/add')
 //POST ajouter un produit
 .post(function(req,res){
@@ -167,8 +161,7 @@ myRouter.route('/produits/action/add')
  console.log(listep[listep.length - 1].toString());
 });
 
-
-
+// La route pour la méthode de mise à jour des attributs
 myRouter.route('/produits/action/update')
 //modifier un produit avec un id précis
 .post(function(req,res){ 
@@ -185,11 +178,11 @@ myRouter.route('/produits/action/update')
               res.json({message : "Vous avez modifier les informations du produit n°",
      id : req.body.id});
             break;
-        }
-        
+        } 
 }
 });
 
+// La route pour la méthode de supression
 myRouter.route('/produits/action/delete')
 //Post pour supprimer un produit avec un id précis
 .post(function(req,res){ 
@@ -203,15 +196,11 @@ myRouter.route('/produits/action/delete')
             res.json({message : "Vous avez supprimer le produit n°" ,id : req.body.id ,  methode : req.method});
             break;
         }
-}
-	  
-    
+}	     
 });
 
 
-
-
-// Nous demandons à l'application d'utiliser notre routeur
+// Je demande à l'application d'utiliser le routeur crée
 app.use(myRouter);  
  
 // Démarrer le serveur 
