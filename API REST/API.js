@@ -7,7 +7,7 @@ var bodyParser = require("body-parser");
 var fs = require('fs');
 
 //liste des objets produits qui remplace provisoirement la BDD
-static var listep=[]; 
+var listep=[]; 
 
 //La Classe Produit
 var Produit = function (id,nom,type,price,raiting,warranty_years,available) {
